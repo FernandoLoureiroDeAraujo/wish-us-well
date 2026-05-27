@@ -12,10 +12,10 @@ const CONFIG = {
 
   // WhatsApp number: country code + DDD + number, no spaces, no +
   // Example: Brazil (55) + SP (11) + 98765-4321 → '5511987654321'
-  whatsappNumber: '5511999999999',
+  whatsappNumber: '5561998147348',
 
   // Your PIX key: CPF, e-mail, phone, or random key
-  pixKey: 'SEU_EMAIL@gmail.com',
+  pixKey: '61998147348',
 
   // Names used in WhatsApp messages
   coupleNames: 'Lorena e Fernando',
