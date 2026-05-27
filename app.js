@@ -8,7 +8,7 @@
 const CONFIG = {
   // Publish your sheet: File → Share → Publish to web → CSV
   // Then paste the URL below.
-  csvUrl: 'https://docs.google.com/spreadsheets/d/16nACSCRqpmpXfb3z-x7i2PNW44Hc_Z69iJ9cx5-_MW8/pub?output=csv',
+  csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vScEK-RFlMNa14Hq3jbadmBSeDItpax3ibK14aDIVI00bFt7CdSjU4pTdFTuTeCk9If589ikJIgFybZ/pub?gid=1785623974&single=true&output=csv',
 
   // WhatsApp number: country code + DDD + number, no spaces, no +
   // Example: Brazil (55) + SP (11) + 98765-4321 → '5511987654321'
@@ -26,17 +26,15 @@ const CONFIG = {
 
 // ── STATE ─────────────────────────────────────────────────────
 let allGifts = [];
-let activeCategory = 'Todos';
 let searchQuery = '';
 let showOnlyAvailable = false;
 
 // ── DOM REFS ──────────────────────────────────────────────────
-const grid          = document.getElementById('gifts-grid');
-const counter       = document.getElementById('gifts-counter');
-const searchInput   = document.getElementById('search-input');
-const chipsContainer = document.getElementById('filter-chips');
-const toggleAvail   = document.getElementById('toggle-available');
-const errorBanner   = document.getElementById('error-banner');
+const grid        = document.getElementById('gifts-grid');
+const counter     = document.getElementById('gifts-counter');
+const searchInput = document.getElementById('search-input');
+const toggleAvail = document.getElementById('toggle-available');
+const errorBanner = document.getElementById('error-banner');
 
 // ── INIT ──────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -44,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderSkeletons(8);
   loadCSV();
 
-  // Update PIX key display and delivery WhatsApp links from config
+  // Update PIX key display and delivery WhatsApp links from CONFIG
   const pixDisplay = document.getElementById('pix-key-display');
   if (pixDisplay) pixDisplay.textContent = CONFIG.pixKey;
 
@@ -130,7 +128,6 @@ async function loadCSV() {
       return;
     }
 
-    buildFilterChips();
     renderGifts();
   } catch (err) {
     console.error('Erro ao carregar CSV:', err);
@@ -163,13 +160,13 @@ function parseCSV(text) {
   };
 
   const idx = {
-    nome:       col(['nome', 'name', 'produto', 'item', 'presente']),
-    categoria:  col(['categoria', 'category', 'cat', 'tipo']),
+    produto:    col(['produto', 'product', 'item', 'presente', 'name']),
+    nome:       col(['nome', 'reservado_por', 'reservante', 'quem_compra', 'comprador']),
     imagem:     col(['imagem', 'image', 'foto', 'img', 'photo', 'url_imagem']),
     link:       col(['link', 'url', 'loja', 'comprar', 'buy', 'url_compra']),
     preco:      col(['preco', 'price', 'valor', 'faixa', 'preco_faixa', 'custo']),
     destaque:   col(['destaque', 'featured', 'wishlist', 'priority']),
-    comprado:   col(['comprado', 'gifted', 'reservado', 'bought', 'presenteado']),
+    comprado:   col(['comprado', 'gifted', 'bought', 'presenteado']),
     observacao: col(['observacao', 'obs', 'nota', 'notes', 'detalhe', 'cor', 'info']),
   };
 
@@ -180,13 +177,13 @@ function parseCSV(text) {
     const get = (key) =>
       idx[key] !== -1 ? (vals[idx[key]] || '').replace(/^"|"$/g, '').trim() : '';
 
-    const nome = get('nome');
-    if (!nome) continue;
+    const produto = get('produto');
+    if (!produto) continue;
 
     gifts.push({
       id:         i,
-      nome,
-      categoria:  get('categoria') || 'Geral',
+      produto,
+      nome:       get('nome'),
       imagem:     get('imagem'),
       link:       get('link'),
       preco:      get('preco'),
@@ -196,13 +193,15 @@ function parseCSV(text) {
     });
   }
 
-  // Sort: featured first, then available, then by name
+  // Sort: featured first, then free (no nome + not comprado), then reserved, then gifted
   return gifts.sort((a, b) => {
     if (a.destaque && !b.destaque) return -1;
     if (!a.destaque && b.destaque) return  1;
-    if (!a.comprado && b.comprado) return -1;
-    if (a.comprado && !b.comprado) return  1;
-    return a.nome.localeCompare(b.nome, 'pt-BR');
+    const aFree = !a.nome && !a.comprado;
+    const bFree = !b.nome && !b.comprado;
+    if (aFree && !bFree) return -1;
+    if (!aFree && bFree) return  1;
+    return a.produto.localeCompare(b.produto, 'pt-BR');
   });
 }
 
@@ -227,45 +226,24 @@ function splitLine(line) {
   return result;
 }
 
-// ── BUILD FILTER CHIPS ────────────────────────────────────────
-function buildFilterChips() {
-  const cats = ['Todos', ...new Set(
-    allGifts.map(g => g.categoria).filter(Boolean).sort((a, b) => a.localeCompare(b, 'pt-BR'))
-  )];
-
-  chipsContainer.innerHTML = '';
-
-  cats.forEach(cat => {
-    const btn = document.createElement('button');
-    btn.className = 'chip' + (cat === activeCategory ? ' active' : '');
-    btn.textContent = cat;
-    btn.type = 'button';
-    btn.addEventListener('click', () => {
-      activeCategory = cat;
-      document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-      btn.classList.add('active');
-      renderGifts();
-    });
-    chipsContainer.appendChild(btn);
-  });
-}
-
 // ── RENDER GIFTS ──────────────────────────────────────────────
 function renderGifts() {
   const filtered = allGifts.filter(g => {
-    const matchCat    = activeCategory === 'Todos' || g.categoria === activeCategory;
     const matchSearch = !searchQuery ||
-      g.nome.toLowerCase().includes(searchQuery) ||
+      g.produto.toLowerCase().includes(searchQuery) ||
       (g.observacao || '').toLowerCase().includes(searchQuery) ||
-      (g.categoria  || '').toLowerCase().includes(searchQuery);
-    const matchAvail  = !showOnlyAvailable || !g.comprado;
-    return matchCat && matchSearch && matchAvail;
+      (g.nome       || '').toLowerCase().includes(searchQuery);
+    // "Só disponíveis" hides both reserved (nome set) and gifted (comprado)
+    const matchAvail = !showOnlyAvailable || (!g.nome && !g.comprado);
+    return matchSearch && matchAvail;
   });
 
-  const available = allGifts.filter(g => !g.comprado).length;
+  const free     = allGifts.filter(g => !g.nome && !g.comprado).length;
+  const reserved = allGifts.filter(g => g.nome && !g.comprado).length;
   counter.innerHTML =
-    `<span>${available}</span> de <span>${allGifts.length}</span> presentes disponíveis` +
-    (filtered.length !== allGifts.length ? ` — mostrando <span>${filtered.length}</span>` : '');
+    `<span>${free}</span> disponíveis · <span>${reserved}</span> reservados · ` +
+    `<span>${allGifts.length}</span> no total` +
+    (filtered.length !== allGifts.length ? ` — exibindo <span>${filtered.length}</span>` : '');
 
   if (filtered.length === 0) {
     grid.innerHTML = `
@@ -288,35 +266,47 @@ function renderGifts() {
 // ── RENDER CARD ───────────────────────────────────────────────
 function renderCard(g) {
   const imgHtml = g.imagem
-    ? `<img class="card-img" src="${esc(g.imagem)}" alt="${esc(g.nome)}" loading="lazy"
+    ? `<img class="card-img" src="${esc(g.imagem)}" alt="${esc(g.produto)}" loading="lazy"
         onerror="this.parentElement.innerHTML=giftPlaceholder()">`
     : giftPlaceholder();
 
   const wppMsg  = encodeURIComponent(
-    `Olá ${CONFIG.coupleNames}! Vou presentear com: *${g.nome}* 🎁 Podem marcar como presenteado!`
+    `Olá ${CONFIG.coupleNames}! Vou presentear com: *${g.produto}* 🎁 Podem marcar como presenteado!`
   );
   const wppHref = `https://wa.me/${CONFIG.whatsappNumber}?text=${wppMsg}`;
+
+  const isReserved = !!g.nome && !g.comprado;
 
   const buyBtn = g.link
     ? `<a href="${esc(g.link)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary">🛍️ Ver na Loja</a>`
     : `<span class="btn btn-primary disabled" aria-disabled="true">Em breve</span>`;
 
-  const notifyBtn = !g.comprado
+  // Show notify button only when item is free (no one reserved yet)
+  const notifyBtn = !g.nome && !g.comprado
     ? `<a href="${wppHref}" target="_blank" rel="noopener noreferrer"
           class="btn btn-notify" title="Avisar que vou comprar este presente (WhatsApp)">✓</a>`
     : '';
 
+  // "Reservado por" badge shown inside card body
+  const reservedBadge = isReserved
+    ? `<div class="card-reservado">👤 Reservado por <strong>${esc(g.nome)}</strong></div>`
+    : '';
+
+  let cardClass = 'card';
+  if (g.comprado)  cardClass += ' is-gifted';
+  if (isReserved)  cardClass += ' is-reserved';
+
   return `
-    <article class="card${g.comprado ? ' is-gifted' : ''}">
+    <article class="${cardClass}">
       <div class="card-img-wrap">
         ${imgHtml}
         ${g.destaque ? '<span class="card-badge-featured">✦ Wishlist</span>' : ''}
       </div>
       <div class="card-body">
-        ${g.categoria ? `<div class="card-category">${esc(g.categoria)}</div>` : ''}
-        <div class="card-name">${esc(g.nome)}</div>
-        ${g.observacao ? `<div class="card-obs">${esc(g.observacao)}</div>` : ''}
-        ${g.preco      ? `<div class="card-price">${esc(g.preco)}</div>`    : ''}
+        <div class="card-name">${esc(g.produto)}</div>
+        ${g.observacao    ? `<div class="card-obs">${esc(g.observacao)}</div>`   : ''}
+        ${g.preco         ? `<div class="card-price">${esc(g.preco)}</div>`      : ''}
+        ${reservedBadge}
       </div>
       <div class="card-actions">
         ${buyBtn}

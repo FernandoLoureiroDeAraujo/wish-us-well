@@ -237,38 +237,6 @@ body {
   background: var(--white);
 }
 
-.filter-chips {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.chip {
-  padding: 6px 16px;
-  border-radius: 999px;
-  border: 1.5px solid var(--border);
-  background: transparent;
-  font-family: inherit;
-  font-size: 0.8rem;
-  font-weight: 500;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all var(--transition);
-  white-space: nowrap;
-}
-
-.chip:hover {
-  border-color: var(--tiffany);
-  color: var(--tiffany);
-}
-
-.chip.active {
-  background: var(--tiffany);
-  border-color: var(--tiffany);
-  color: var(--white);
-}
-
 .toggle-available {
   margin-left: auto;
   display: flex;
@@ -337,6 +305,10 @@ body {
 
 .card.is-gifted {
   opacity: 0.52;
+}
+
+.card.is-reserved {
+  opacity: 0.72;
 }
 
 .card.is-gifted .card-img-wrap::after {
@@ -417,15 +389,6 @@ body {
   flex-direction: column;
 }
 
-.card-category {
-  font-size: 0.7rem;
-  color: var(--tiffany-dark);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 6px;
-}
-
 .card-name {
   font-family: 'Playfair Display', serif;
   font-size: 1rem;
@@ -449,6 +412,16 @@ body {
   color: var(--tiffany-dark);
   margin-top: auto;
   padding-top: 8px;
+}
+
+.card-reservado {
+  margin-top: 10px;
+  font-size: 0.76rem;
+  color: var(--tiffany-dark);
+  background: var(--tiffany-light);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  display: inline-block;
 }
 
 .card-actions {
