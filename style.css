@@ -209,13 +209,22 @@ body {
   top: 0;
   z-index: 100;
   border-bottom: 1px solid var(--border);
-  padding: 12px 24px;
+  padding: 12px 24px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.filter-bar-top {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 12px;
   flex-wrap: wrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  width: 100%;
+  padding-bottom: 12px;
 }
 
 .search-input {
@@ -261,13 +270,12 @@ body {
 
 .list-notice {
   background: var(--tiffany-light);
-  border: 1px solid var(--tiffany);
-  border-radius: var(--radius-sm);
-  padding: 12px 18px;
-  font-size: 0.85rem;
+  border-top: 1px solid var(--tiffany-light);
+  width: 100%;
+  padding: 9px 18px;
+  font-size: 0.8rem;
   color: var(--tiffany-dark);
   text-align: center;
-  margin-bottom: 16px;
   line-height: 1.5;
 }
 
@@ -796,7 +804,8 @@ footer p {
 
 @media (max-width: 680px) {
   .hero { padding: 60px 20px 44px; }
-  .filter-bar { padding: 10px 16px; gap: 8px; }
+  .filter-bar { padding: 10px 16px 0; }
+  .filter-bar-top { padding-bottom: 10px; gap: 8px; }
   .search-input { max-width: 100%; min-width: 0; flex-basis: 100%; }
   .toggle-available { margin-left: 0; }
   .gifts-section { padding: 24px 14px 48px; }
