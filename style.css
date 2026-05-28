@@ -212,15 +212,16 @@ body {
   padding: 12px 24px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   flex-wrap: wrap;
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
 
 .search-input {
-  flex: 1;
+  flex: 0 1 360px;
   min-width: 180px;
-  max-width: 280px;
+  max-width: 360px;
   border: 1.5px solid var(--border);
   border-radius: 999px;
   padding: 8px 18px;
@@ -238,7 +239,6 @@ body {
 }
 
 .toggle-available {
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -256,6 +256,52 @@ body {
   cursor: pointer;
 }
 
+
+/* ── LIST NOTICE & TIP CARD ─────────────────────────────────── */
+
+.list-notice {
+  background: var(--tiffany-light);
+  border: 1px solid var(--tiffany);
+  border-radius: var(--radius-sm);
+  padding: 12px 18px;
+  font-size: 0.85rem;
+  color: var(--tiffany-dark);
+  text-align: center;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.tip-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  background: var(--white);
+  border: 1.5px solid var(--tiffany-light);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 28px;
+  box-shadow: var(--shadow-card);
+}
+
+.tip-card-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.tip-card-content strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.tip-card-content p {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
 
 /* ── GIFTS SECTION ──────────────────────────────────────────── */
 
@@ -465,20 +511,38 @@ body {
   transform: none;
 }
 
-.btn-notify {
-  flex: 0 0 auto;
-  background: transparent;
-  border: 1.5px solid var(--tiffany);
-  color: var(--tiffany);
-  padding: 10px 13px;
+.notify-wrap {
+  padding: 0 14px 14px;
 }
 
-.btn-notify:hover {
-  background: var(--tiffany-light);
+.btn-wpp-notify {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: var(--radius-sm);
+  background: #25D366;
+  color: white;
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all var(--transition);
 }
 
-.btn-notify[title] {
-  position: relative;
+.btn-wpp-notify:hover {
+  background: #1db954;
+  transform: translateY(-1px);
+}
+
+.notify-hint {
+  margin-top: 6px;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.4;
 }
 
 
